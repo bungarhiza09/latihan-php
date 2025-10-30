@@ -4,29 +4,203 @@
     <title>PHP - Aplikasi Todolist</title>
     <link href="/assets/vendor/bootstrap-5.3.8-dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <style>
+     <style>
         body {
-            background-color: #f5f7fa;
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+            font-family: "Poppins", sans-serif;
+            color: #2d3436;
+            overflow-x: hidden;
         }
+
+        /* 🌈 Header gradient */
+        .bg-gradient {
+            background: linear-gradient(120deg, #007bff, #6610f2);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bg-gradient::after {
+            content: '';
+            position: absolute;
+            width: 180%;
+            height: 180%;
+            top: -40%;
+            left: -40%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            animation: rotateLight 15s linear infinite;
+        }
+
+        @keyframes rotateLight {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 🪩 Todo Card */
         .todo-card {
-            transition: transform 0.2s, box-shadow 0.2s;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid #eaeaea;
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            transform: scale(1);
             cursor: pointer;
         }
+
         .todo-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: scale(1.03);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
         }
+
+        /* 🧾 Isi todo */
+        .card-title {
+            font-weight: 600;
+            color: #212529;
+        }
+
         .description {
-            min-height: 60px;
             color: #6c757d;
+            font-size: 0.95rem;
         }
-        .status-badge {
-            font-size: 0.85rem;
+
+        /* 🌟 Tombol utama */
+        .btn {
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+        }
+
+        /* 🌊 Efek Ripple saat klik tombol */
+        .btn::after {
+            content: "";
+            position: absolute;
+            background: rgba(255,255,255,0.5);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            transform: scale(1);
+            opacity: 0;
+            transition: all 0.6s ease-out;
+        }
+
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+            transition: all 0.6s ease-out;
+        }
+
+        /* 🟢 Tombol tambah todo */
+        .btn-success {
+            background: linear-gradient(90deg, #20c997, #17a2b8);
+            border: none;
+            box-shadow: 0 4px 10px rgba(32, 201, 151, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        /* 🕶 Filter dan search */
+        .form-control, .dropdown-toggle {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+        }
+
+        /* 🌙 Modal */
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            animation: popIn 0.4s ease-out;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* 🌟 Alert */
+        .alert {
+            border-radius: 12px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ✨ Animasi daftar todo */
+        #todo-list .col-12 {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Delay tiap todo */
+        #todo-list .col-12:nth-child(1) { animation-delay: 0.1s; }
+        #todo-list .col-12:nth-child(2) { animation-delay: 0.2s; }
+        #todo-list .col-12:nth-child(3) { animation-delay: 0.3s; }
+
+        /* 🧿 Footer */
+        footer {
+            text-align: center;
+            color: #6c757d;
+            padding: 20px 0;
+        }
+
+        footer span {
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
     </style>
 </head>
 <body>
-<div class="container py-5">
+
+<section class="text-center py-5 bg-gradient position-relative overflow-hidden">
+    <div class="container position-relative" style="z-index:2;">
+        <h1 class="fw-bold display-4 text-white mb-3 animate-fade">
+            Selamat Datang di <span class="text-warning">TodoList App</span> 📋
+        </h1>
+        <p class="lead text-white-50 mb-4 animate-fade">
+            Catat, atur, dan selesaikan semua aktivitasmu dengan mudah dan cepat.
+        </p>
+        <a href="#todo-section" class="btn btn-light btn-lg fw-semibold shadow-sm animate-fade">
+            Mulai Sekarang 🚀
+        </a>
+    </div>
+    <div class="position-absolute top-0 start-0 w-100 h-100 bg-primary" style="
+        background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
+        opacity: 0.9;
+        z-index:1;">
+    </div>
+</section>
+
+<div id="todo-section" class="container py-5">
         <!-- 🔔 Panel Notifikasi -->
     <?php if (!empty($error)): ?>
         <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
@@ -114,7 +288,7 @@
                                 <div class="d-flex justify-content-end">
                                     <button class="btn btn-sm btn-info text-white me-2"
                                         onclick="event.stopPropagation(); showModalDetailTodo(<?= $todo['id'] ?>, '<?= htmlspecialchars(addslashes($todo['activity'])) ?>', <?= $todo['status'] ?>)">
-                                        👁️ Detail
+                                        👁️
                                     </button>
                                     <button class="btn btn-sm btn-warning me-2"
                                         onclick="event.stopPropagation(); showModalEditTodo(<?= $todo['id'] ?>, '<?= htmlspecialchars(addslashes($todo['activity'])) ?>', <?= $todo['status'] ?>)">
@@ -336,5 +510,61 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 </script>
+<script>
+    // ✨ Efek ripple klik tombol
+    document.addEventListener("click", function(e){
+        const btn = e.target.closest(".btn");
+        if (!btn) return;
+        const circle = document.createElement("span");
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        circle.style.width = circle.style.height = size + "px";
+        circle.style.left = e.clientX - rect.left - size/2 + "px";
+        circle.style.top = e.clientY - rect.top - size/2 + "px";
+        circle.classList.add("ripple");
+        btn.appendChild(circle);
+        setTimeout(() => circle.remove(), 600);
+    });
+
+    // ✨ Efek muncul halus saat scroll
+    const observer = new IntersectionObserver((entries)=>{
+        entries.forEach(entry=>{
+            if(entry.isIntersecting){
+                entry.target.classList.add("animate");
+            }
+        });
+    }, {threshold:0.1});
+
+    document.querySelectorAll(".todo-card").forEach(el=>observer.observe(el));
+</script>
+
+<style>
+    /* tambahan efek ripple */
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        transform: scale(0);
+        animation: rippleAnim 0.6s linear;
+        background: rgba(255,255,255,0.4);
+        pointer-events: none;
+    }
+    @keyframes rippleAnim {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    /* muncul saat scroll */
+    .todo-card {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    .todo-card.animate {
+        opacity: 1;
+        transform: translateY(0);
+        transition: all 0.6s ease-out;
+    }
+</style>
 </body>
 </html>
